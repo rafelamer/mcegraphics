@@ -1,0 +1,55 @@
+Filename:   mcegraphics.h
+Author:     Rafel Amer (rafel.amer AT upc.edu)
+Copyright:  Rafel Amer 2018
+Disclaimer: This code is presented "as is" and it has been written to
+            implement basic graphics compression based on Haar Wavelets
+            and two dimensional cosine transform. It has been developed
+            for educational purposes.
+
+License:    This library  is free software; you can redistribute it and/or
+            modify it under the terms of either:
+
+            1 the GNU Lesser General Public License as published by the Free
+              Software Foundation; either version 3 of the License, or (at your
+              option) any later version.
+
+            or
+
+            2 the GNU General Public License as published by the Free Software
+              Foundation; either version 2 of the License, or (at your option)
+              any later version.
+
+            See https://www.gnu.org/licenses/
+
+To install the library, execute
+ ~# make
+ ~# sudo make install
+ ~# sudo ldconfig
+
+To compile the tests, execute
+~$ cd tests
+~$ make
+
+To compile and install the programs, execute
+~$ cd theprogram
+~$ make
+~$ sudo make install
+
+Bibliography:
+
+(1) Programming Projects in C for Students of
+    Engineering, Science and Mathematics
+    Rouben Rostamian
+    SIAM
+    Computational Science & Engineering (2014)
+    ISBN 978-1-611973-49-5
+
+(2) Discovering Wavelets
+    Edward Aboufadel and Steven Schlicker
+    Wiley Interscience, first edition 1999
+    ISBN-10: 0471331937
+    ISBN-13: 978-0471331933
+
+Resources:
+
+(1) https://en.wikipedia.org/wiki/JPEG (2018-03-19)

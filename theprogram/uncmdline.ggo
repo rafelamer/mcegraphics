@@ -1,0 +1,8 @@
+package "mcecompress"
+version "0.1"
+purpose "Uncompress a grayscale or color image
+in MCE to PGM or PPM formats
+By Rafel Amer <rafel.amer@upc.edu>"
+
+option "infile" i "Image to uncompress" string required
+option "outfile" o "Output for uncompressed file" string required

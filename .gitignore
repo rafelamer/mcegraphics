@@ -1,0 +1,6 @@
+*.o
+cmdline.c
+cmdline.h
+uncmdline.c
+uncmdline.h
+

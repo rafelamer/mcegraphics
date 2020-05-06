@@ -1,0 +1,12 @@
+package "mcecompress"
+version "0.1"
+purpose "Compress a grayscale or color image
+in PGM or PPM formats to MCE format
+By Rafel Amer <rafel.amer@upc.edu>"
+
+option "infile" i "Image to compress" string required
+option "outfile" o "Output for compressed file" string required
+option "transform" t "Matrix transform: haar or dct" string values="haar","dct" enum optional default="dct"
+option "compress" c "Compression type: zlib or wsq" string values="zlib", "wsq" enum optional default="wsq"
+option "blocksize" s "Block size of submatrices. Default 32. Minimum 8" short optional default="32"
+option "quality" q "Quality of the compression, Default 80%" float optional default="80"
