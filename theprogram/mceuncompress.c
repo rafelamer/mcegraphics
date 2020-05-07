@@ -1,9 +1,13 @@
-#include <mceuncompress.h>
+#include <mcegraphics.h>
+#include <array.h>
+#include <math.h>
+#include <stdlib.h>
+#include <uncmdline.h>
 
 void process_submatrix(double **m,void *params)
 {
-	Params *p = (Params *)params;
-	read_and_uncompress(m,p->data,p->cdata,p->zigzag,p->size,p->compress,p->input);
+	Params p = (Params)params;
+	read_and_uncompress(m,p->data,p->cdata,p->zigzag,p->size,p->compress,p->inout);
 	if(p->transform == TRANSFORMDCT)
 		dct_matrix(m,p->size,p->size,DCT_REV,DCT_SCALED);
 	else 
@@ -12,10 +16,10 @@ void process_submatrix(double **m,void *params)
 
 void process_submatrices(double **red,double **green,double **blue,void *params)
 {
-	Params *p = (Params *)params;
-	read_and_uncompress(red,p->data,p->cdata,p->zigzag,p->size,p->compress,p->input);
-	read_and_uncompress(green,p->data,p->cdata,p->zigzag,p->size,p->compress,p->input);
-	read_and_uncompress(blue,p->data,p->cdata,p->zigzag,p->size,p->compress,p->input);
+	Params p = (Params)params;
+	read_and_uncompress(red,p->data,p->cdata,p->zigzag,p->size,p->compress,p->inout);
+	read_and_uncompress(green,p->data,p->cdata,p->zigzag,p->size,p->compress,p->inout);
+	read_and_uncompress(blue,p->data,p->cdata,p->zigzag,p->size,p->compress,p->inout);
 	if(p->transform == TRANSFORMDCT)
 	{
 		dct_matrix(red,p->size,p->size,DCT_REV,DCT_SCALED);
@@ -32,8 +36,8 @@ void process_submatrices(double **red,double **green,double **blue,void *params)
 
 int main(int argc,char *argv[])
 {
-	Image *img;
-	Params *p;
+	Image img;
+	Params p;
 
 	static struct gengetopt_args_info args_info;
 
@@ -49,14 +53,14 @@ int main(int argc,char *argv[])
 	/*
 		Setting the parameters for function process_submatrix
 	*/
- 	p = (Params *)malloc(sizeof(Params));
- 	p->input = fopen(args_info.infile_arg,"r");
-	file_read(&p->height,sizeof(int),1,p->input);
-	file_read(&p->width,sizeof(int),1,p->input);
-	file_read(&p->depth,sizeof(int),1,p->input);
-	file_read(&p->size,sizeof(unsigned short),1,p->input);
-	file_read(&p->transform,sizeof(unsigned char),1,p->input);
- 	file_read(&p->compress,sizeof(unsigned char),1,p->input);
+ 	p = (Params)malloc(sizeof(function_params));
+ 	p->inout = fopen(args_info.infile_arg,"r");
+	file_read(&p->height,sizeof(int),1,p->inout);
+	file_read(&p->width,sizeof(int),1,p->inout);
+	file_read(&p->depth,sizeof(int),1,p->inout);
+	file_read(&p->size,sizeof(unsigned short),1,p->inout);
+	file_read(&p->transform,sizeof(unsigned char),1,p->inout);
+ 	file_read(&p->compress,sizeof(unsigned char),1,p->inout);
 
  	make_vector(p->data,p->size*p->size);
  	make_vector(p->cdata,sizeof(short)*p->size*p->size+1);
@@ -66,7 +70,7 @@ int main(int argc,char *argv[])
 		Setting the image basic data
  	*/
  	pm_init(argv[0],0);
-	img = (Image *)malloc(sizeof(Image));
+	img = (Image)malloc(sizeof(image_data));
 
 	img->pam.width = p->width;
 	img->pam.height = p->height;
@@ -102,7 +106,7 @@ int main(int argc,char *argv[])
 	free_vector(p->data);
 	free_vector(p->cdata);
 	free_matrix(p->zigzag);
-	fclose(p->input);
+	fclose(p->inout);
 	free(p);
-	free_image(img);
+	free_image(&img);
 }

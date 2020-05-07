@@ -1,14 +1,22 @@
 CFLAGS = -O3 -I.
-LIBS = -lmcegrahics -lnetpbm -lfftw3 -lm -lz
+LIBS = -lmcegraphics -lnetpbm -lfftw3 -lm -lz
 CC = gcc
 TARGET1 = mcecompress 
 TARGET2 = mceuncompress
+OBJECTS = mcecompress.o mceuncompress.o cmdline.o uncmdline.o
+INCLUDES = cmdline.h uncmdline.h
 
-$(TARGET1): mcecompress.o cmdline.o
+$(TARGET1): $(OBJECTS) $(INCLUDES)
 	$(CC) -o $(TARGET1) mcecompress.o cmdline.o $(LIBS)
 
-$(TARGET2): mceuncompress.o uncmdline.o
+$(TARGET2): $(OBJECTS) $(INCLUDES)
 	$(CC) -o $(TARGET2) mceuncompress.o uncmdline.o $(LIBS)
+
+mcecompress.o: mcecompress.c cmdline.c
+	$(CC) -c -o mcecompress.o $(CFLAGS) mcecompress.c
+
+mceuncompress.o: mceuncompress.c uncmdline.c
+	$(CC) -c -o mceuncompress.o $(CFLAGS) mceuncompress.c
 
 cmdline.c: cmdline.ggo
 	gengetopt --input=cmdline.ggo

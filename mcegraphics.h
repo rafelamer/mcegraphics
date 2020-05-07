@@ -26,7 +26,7 @@
 #define H_MCE_GRAPHICS_H 1
 
 #include <pam.h>
-
+#include <zlib.h>
 /*
    Images
 
@@ -57,9 +57,6 @@ void free_image(Image *img);
 /*
   Params
  */
-#define TRANSFORMHAAR 0
-#define TRANSFORMDCT 1
-
 typedef struct 
 {
   double quality;
@@ -71,10 +68,12 @@ typedef struct
   unsigned char transform;
   unsigned char compress;
   unsigned int depth;
+  unsigned int size;
+  unsigned int height;
+  unsigned int width;	
   FILE *inout;
 } function_params;
 typedef function_params *Params;
-
 /*
   Haar Wavelets Transform
  */
@@ -98,16 +97,16 @@ void dct_matrix(double **a, int m, int n, int dir,int scaled);
 /*
   Compress and uncompress data
  */
+#define TRANSFORMHAAR 0
+#define TRANSFORMDCT 1
 #define COMPRESSZLIB 0
 #define COMPRESSWSQ 1
 
 void zigzag_matrix(unsigned short **m,int size);
 void zlib_compress_data(short *in,unsigned char *out,int insize,unsigned short *l);
-void zlib_uncompress_data(short *out,char *in,int outsize);
-void zlib_uncompress_data_from_file(short *out,char *in,int size,FILE *stream);
+void zlib_uncompress_data(short *out,char *in,int size,FILE *stream);
 void wsq_compress_data(short *in,unsigned char *out,int insize,int *outsize);
-void wsq_uncompress_data(short *out,unsigned char *in,int size);
-void wsq_uncompress_data_from_file(short *out,int size,FILE *stream);
+void wsq_uncompress_data(short *out,int size,FILE *stream);
 
 /*
   File read and write
@@ -124,11 +123,14 @@ void read_and_uncompress(double **mat,short *vec,unsigned char *v,unsigned short
 #define COPYMATRIX 2
 #define TRANSFORMMATRIX 3
 
+typedef void (*CompressGrayScale)(double **,void *);
+typedef void (*CompressColor)(double **,double **,double **,void *);
 typedef void (*ProcessSubMatrix)(double **,double **,double **,int,void *);
 
 void part_of_matrix(double **g,double **s,int rows,int columns,int size,int i, int j);
 void restore_part_of_matrix(double **g,double **s,int rows,int columns,int size,int i, int j);
-void foreach_submatrices(Image img,int size,unsigned char restore,ProcessSubMatrix f,void *params);
+void foreach_submatrix(double **g,int rows,int columns,int size,unsigned char restore,CompressGrayScale f,void *params);
+void foreach_submatrices(double **red,double **green,double **blue,int rows,int columns,int size,unsigned char restore,CompressColor f,void *params);
 void prune_matrix_by_percentage(double **g,double *vec,int m,int n,int quality);
 void prune_matrices_by_percentage(double **r,double **g,double **b,double **T,double *vec,int m,int n,int quality);
 

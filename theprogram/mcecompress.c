@@ -1,20 +1,24 @@
-#include <mcecompress.h> 
+#include <mcegraphics.h>
+#include <array.h>
+#include <math.h>
+#include <stdlib.h>
+#include <cmdline.h>
 
 void process_submatrix(double **m,void *params)
 {
-	Params *p = (Params *)params;
+	Params p = (Params )params;
 	
 	if(p->transform == TRANSFORMDCT)
 		dct_matrix(m,p->size,p->size,DCT_FWD,DCT_SCALED);
 	else 
 		haar_transform_matrix(m,p->size,p->size,WT_FWD);
 	prune_matrix_by_percentage(m,p->vector,p->size,p->size,p->quality);
-	compress_and_save(m,p->data,p->cdata,p->zigzag,p->size,p->compress,p->output);
+	compress_and_save(m,p->data,p->cdata,p->zigzag,p->size,p->compress,p->inout);
 }
 
 void process_submatrices(double **red,double **green,double **blue,void *params)
 {
-	Params *p = (Params *)params;
+	Params p = (Params)params;
 	if(p->transform == TRANSFORMDCT) 
 	{
 		dct_matrix(red,p->size,p->size,DCT_FWD,DCT_SCALED);
@@ -28,15 +32,15 @@ void process_submatrices(double **red,double **green,double **blue,void *params)
 		haar_transform_matrix(blue,p->size,p->size,WT_FWD);
 	}
 	prune_matrices_by_percentage(red,green,blue,p->T,p->vector,p->size,p->size,p->quality);
-	compress_and_save(red,p->data,p->cdata,p->zigzag,p->size,p->compress,p->output);
-	compress_and_save(green,p->data,p->cdata,p->zigzag,p->size,p->compress,p->output);
-	compress_and_save(blue,p->data,p->cdata,p->zigzag,p->size,p->compress,p->output);
+	compress_and_save(red,p->data,p->cdata,p->zigzag,p->size,p->compress,p->inout);
+	compress_and_save(green,p->data,p->cdata,p->zigzag,p->size,p->compress,p->inout);
+	compress_and_save(blue,p->data,p->cdata,p->zigzag,p->size,p->compress,p->inout);
 }
 
 int main(int argc,char *argv[])
 {
-	Image *img;
-	Params *p;
+	Image img;
+	Params p;
 
 	static struct gengetopt_args_info args_info;
 
@@ -77,7 +81,7 @@ int main(int argc,char *argv[])
 	/*
 		Setting the parameters for function process_submatrix
 	*/
- 	p = (Params *)malloc(sizeof(Params));
+ 	p = (Params)malloc(sizeof(function_params));
  	p->size = (unsigned short)args_info.blocksize_arg;
  	unsigned short pw = 1;
  	while(pw < p->size)
@@ -91,7 +95,7 @@ int main(int argc,char *argv[])
  	make_vector(p->vector,p->size*p->size);
  	make_vector(p->cdata,sizeof(short)*p->size*p->size+1);
  	p->quality = args_info.quality_arg;
- 	p->output = fopen(args_info.outfile_arg,"w");
+ 	p->inout = fopen(args_info.outfile_arg,"w");
  	make_matrix(p->zigzag,p->size,p->size);
  	zigzag_matrix(p->zigzag,p->size);
 	p->transform = args_info.transform_arg;
@@ -101,12 +105,12 @@ int main(int argc,char *argv[])
 	/*
 		Start writing the output file
 	*/
- 	file_write(&img->pam.height,sizeof(int),1,p->output);
- 	file_write(&img->pam.width,sizeof(int),1,p->output);
- 	file_write(&img->pam.depth,sizeof(int),1,p->output);
- 	file_write(&p->size,sizeof(unsigned short),1,p->output);
- 	file_write(&p->transform,sizeof(unsigned char),1,p->output);
- 	file_write(&p->compress,sizeof(unsigned char),1,p->output);
+ 	file_write(&img->pam.height,sizeof(int),1,p->inout);
+ 	file_write(&img->pam.width,sizeof(int),1,p->inout);
+ 	file_write(&img->pam.depth,sizeof(int),1,p->inout);
+ 	file_write(&p->size,sizeof(unsigned short),1,p->inout);
+ 	file_write(&p->transform,sizeof(unsigned char),1,p->inout);
+ 	file_write(&p->compress,sizeof(unsigned char),1,p->inout);
 
 	if(img->pam.depth == 1)
 	{
@@ -122,7 +126,7 @@ int main(int argc,char *argv[])
 	free_vector(p->vector);
 	free_vector(p->cdata);
 	free_matrix(p->zigzag);
-	fclose(p->output);
+	fclose(p->inout);
 	free(p);
-	free_image(img);
+	free_image(&img);
 }
