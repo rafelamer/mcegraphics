@@ -32,7 +32,7 @@ To compile the tests, execute
 
 To compile and install the programs, execute
 ~$ cd theprogram
-~$ make
+~$ make all
 ~$ sudo make install
 
 Bibliography:

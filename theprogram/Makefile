@@ -30,7 +30,7 @@ cmdline.o: cmdline.c
 uncmdline.o: uncmdline.c
 	$(CC) -c -o uncmdline.o $(CFLAGS) uncmdline.c
 
-all: cmdline.o uncmdline.o $(TARGET1) $(TARGET2)
+all: $(TARGET1) $(TARGET2)
 
 install:
 	cp $(TARGET1) $(TARGET2) /usr/local/bin/

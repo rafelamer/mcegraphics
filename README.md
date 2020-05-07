@@ -22,7 +22,7 @@ To install the library, you have to run the following commands
 To install the programs, you have to do
 ```
 ~$ cd theprogram
-~$ make
+~$ make all
 ~$ sudo make install
 ```
 
