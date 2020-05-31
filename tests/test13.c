@@ -1,4 +1,4 @@
-#include <mce/mcegraphics.h>
+#include <mcegraphics.h>
 
 void transform(double **red,double **green,double **blue,int size,void *params)
 {

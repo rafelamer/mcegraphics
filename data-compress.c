@@ -45,9 +45,12 @@ void zlib_compress_data(short *in,unsigned char *out,int size,unsigned short *l)
 
 void zlib_uncompress_data(short *out,char *in,int size,FILE *stream)
 {
-  unsigned short l;
-  file_read(&l,sizeof(unsigned short),1,stream);
-  file_read(&in,sizeof(char),l,stream);
+  unsigned short l
+  if (stream != NULL) 
+  {
+    file_read(&l,sizeof(unsigned short),1,stream);
+    file_read(&in,sizeof(char),l,stream);
+  }
 
   z_stream infstream; 
   infstream.zalloc = Z_NULL;

@@ -1,4 +1,4 @@
-#include <mce/mcegraphics.h>
+#include <mcegraphics.h>
 #include <string.h>
 
 void usage(int argc,char *argv[])

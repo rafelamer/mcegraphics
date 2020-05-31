@@ -1,5 +1,5 @@
-#include <mce/mcegraphics.h>
-#include <mce/array.h>
+#include <mcegraphics.h>
+#include <array.h>
 
 int main(int argc,char *argv[])
 {
