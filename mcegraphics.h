@@ -119,18 +119,14 @@ void read_and_uncompress(double **mat,short *vec,unsigned char *v,unsigned short
 /*
   Matrix split and prune
  */
-#define RESTOREMATRIX 1
-#define COPYMATRIX 2
-#define TRANSFORMMATRIX 3
-
 typedef void (*CompressGrayScale)(double **,void *);
 typedef void (*CompressColor)(double **,double **,double **,void *);
 typedef void (*ProcessSubMatrix)(double **,double **,double **,int,void *);
 
 void part_of_matrix(double **g,double **s,int rows,int columns,int size,int i, int j);
 void restore_part_of_matrix(double **g,double **s,int rows,int columns,int size,int i, int j);
-void foreach_submatrix(double **g,int rows,int columns,int size,unsigned char restore,CompressGrayScale f,void *params);
-void foreach_submatrices(double **red,double **green,double **blue,int rows,int columns,int size,unsigned char restore,CompressColor f,void *params);
+void foreach_submatrix(double **g,int rows,int columns,int size,CompressGrayScale f,void *params);
+void foreach_submatrices(double **red,double **green,double **blue,int rows,int columns,int size,CompressColor f,void *params);
 void prune_matrix_by_percentage(double **g,double *vec,int m,int n,int quality);
 void prune_matrices_by_percentage(double **r,double **g,double **b,double **T,double *vec,int m,int n,int quality);
 

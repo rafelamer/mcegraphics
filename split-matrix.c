@@ -79,19 +79,8 @@ void restore_part_of_matrix(double **g,double **s,int rows,int columns,int size,
 }
 
 /*
-  The use of the function foreach_submatrices are possible in three ways,
-  depending of the value of the parameter restore
+  The use of the function foreach_submatrices in the followin way:
 
-  1. If restore == COPYMATRIX
-     we apply the function f to a copy of every submatrix of
-     red, green and blue. Note that red, green and blue are not modified
-     during the process.
-
-  2. If restore == RESTOREMATRIX
-     We apply the function f to fill the matrices rs, gs, bs and then copy
-     the contents of that matrix to red, green and blue.
-
-  3. If restore == TRANSFORMMATRIX
      We copy the submatrices, apply the functions f and then restore the
      values of the modified matrices
     
@@ -104,7 +93,7 @@ void restore_part_of_matrix(double **g,double **s,int rows,int columns,int size,
   void *param
  */
 
-void foreach_submatrix(double **g,int rows,int columns,int size,unsigned char restore,CompressGrayScale f,void *params)
+void foreach_submatrix(double **g,int rows,int columns,int size,CompressGrayScale f,void *params)
 {
 	int c, r;
 	double **s;
@@ -119,21 +108,14 @@ void foreach_submatrix(double **g,int rows,int columns,int size,unsigned char re
 	for(int i=0;i<=r;i++)
 		for(int j=0;j<=c;j++)
 		{
-			if(restore == COPYMATRIX)
-			{
 				part_of_matrix(g,s,rows,columns,size,i,j);
 				f(s,params);
-			}
-			else
-			{
-				f(s,params);
 				restore_part_of_matrix(g,s,rows,columns,size,i,j);
-			}
 		}
 	free_matrix(s);
 }
 
-void foreach_submatrices(double **red,double **green,double **blue,int rows,int columns,int size,unsigned char restore,CompressColor f,void *params)
+void foreach_submatrices(double **red,double **green,double **blue,int rows,int columns,int size,CompressColor f,void *params)
 {
 	int c, r;
 	double **rs, **gs, **bs;
@@ -150,20 +132,13 @@ void foreach_submatrices(double **red,double **green,double **blue,int rows,int 
 	for(int i=0;i<=r;i++)
 		for(int j=0;j<=c;j++)
 		{
-			if(restore == COPYMATRIX)
-			{
-				part_of_matrix(red,rs,rows,columns,size,i,j);
-				part_of_matrix(green,gs,rows,columns,size,i,j);
-				part_of_matrix(blue,bs,rows,columns,size,i,j);
-				f(rs,gs,bs,params);
-			}
-			else
-			{
-				f(rs,gs,bs,params);
-				restore_part_of_matrix(red,rs,rows,columns,size,i,j);
-				restore_part_of_matrix(green,gs,rows,columns,size,i,j);
-				restore_part_of_matrix(blue,bs,rows,columns,size,i,j);
-			}
+			part_of_matrix(red,rs,rows,columns,size,i,j);
+			part_of_matrix(green,gs,rows,columns,size,i,j);
+			part_of_matrix(blue,bs,rows,columns,size,i,j);
+			f(rs,gs,bs,params);
+			restore_part_of_matrix(red,rs,rows,columns,size,i,j);
+			restore_part_of_matrix(green,gs,rows,columns,size,i,j);
+			restore_part_of_matrix(blue,bs,rows,columns,size,i,j);
 		}
 	free_matrix(rs);
 	free_matrix(gs);

@@ -91,7 +91,7 @@ void read_and_uncompress(double **mat,short *vec,unsigned char *v,unsigned short
   if(method == COMPRESSZLIB)
     zlib_uncompress_data(vec,v,size*size,stream); 
   else
-    wsq_uncompress_data(vec,size*size,stream);
+    wsq_uncompress_data(vec,v,size*size,stream);
 
   for(int i=0;i < size;i++)
     for(int j=0;j < size;j++)
