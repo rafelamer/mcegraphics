@@ -155,12 +155,6 @@ void foreach_submatrices(double **red,double **green,double **blue,int rows,int 
 			part_of_matrix(green,gs,rows,columns,size,i,j);
 			part_of_matrix(blue,bs,rows,columns,size,i,j);
 			f(rs,gs,bs,params);
-			if (p->transpose)
-			{
-				int aux = rows;
-				rows = columns;
-				columns = aux;
-			}
 			restore_part_of_matrix(red,rs,rows,columns,size,i,j);
 			restore_part_of_matrix(green,gs,rows,columns,size,i,j);
 			restore_part_of_matrix(blue,bs,rows,columns,size,i,j);
