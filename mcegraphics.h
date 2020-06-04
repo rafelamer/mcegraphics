@@ -70,7 +70,8 @@ typedef struct
   unsigned int depth;
   unsigned int size;
   unsigned int height;
-  unsigned int width;	
+  unsigned int width;
+	unsigned int transpose; 
   FILE *inout;
 } function_params;
 typedef function_params *Params;

@@ -46,14 +46,30 @@ void part_of_matrix(double **g,double **s,int rows,int columns,int size,int i, i
 	for(int m=0;m < size;m++)
 		for(int n=0;n < size;n++)
 		{
-			if((size*i+m < rows) && (size*j+n < columns))
-				s[m][n] = g[size*i+m][size*j+n] - 128;
-			else if((size*i+m >= rows) && (size*j+n >= columns))
-				s[m][n] = g[size*i-m][size*j-n] - 128;
-			else if(size*i+m >= rows)
-				s[m][n] = g[size*i-m][size*j+n] - 128;
-			else if(size*j+n >= columns)
-				s[m][n] = g[size*i+m][size*j-n] - 128;
+			if((size * i + m < rows) && (size * j + n < columns))
+			{
+				s[m][n] = g[size * i + m][size * j + n];
+			}
+			else if((size * i + m >= rows) && (size * j + n >= columns))
+			{
+				int k1 = size * i + m;
+				int k2 = size * j + n;
+				k1 = k1 - k1 % rows - 1;
+				k2 = k2 - k2 % columns - 1;
+				s[m][n] = g[k1][k2];
+			}
+			else if(size * i + m >= rows)
+			{
+				int k1 = size * i + m;
+				k1 = k1 - k1 % rows - 1;
+				s[m][n] = g[k1][size * j + n];
+			}
+			else if(size * j + n >= columns)
+			{
+				int k2 = size * j + n;
+				k2 = k2 - k2 % columns - 1;
+				s[m][n] = g[size * i + m][k2];
+			}
 		}
 }
 
@@ -75,7 +91,7 @@ void restore_part_of_matrix(double **g,double **s,int rows,int columns,int size,
 	for(int m=0;m < size;m++)
 		for(int n=0;n < size;n++)
 			if((size*i+m < rows) && (size*j+n < columns))
-				g[size*i+m][size*j+n] = lrint(s[m][n]  + 128);
+				g[size*i+m][size*j+n] = lrint(s[m][n]);
 }
 
 /*
@@ -119,27 +135,37 @@ void foreach_submatrices(double **red,double **green,double **blue,int rows,int 
 {
 	int c, r;
 	double **rs, **gs, **bs;
-
+	Params p = (Params)params;
+	
 	make_matrix(rs,size,size);
 	make_matrix(gs,size,size);
 	make_matrix(bs,size,size);
 	r = rows/size;
-	if(size * r== rows)
+	if(size * r == rows)
 		r--;
 	c = columns/size;
 	if(size * c == columns)
 		c--;
+	
 	for(int i=0;i<=r;i++)
+	{
 		for(int j=0;j<=c;j++)
 		{
 			part_of_matrix(red,rs,rows,columns,size,i,j);
 			part_of_matrix(green,gs,rows,columns,size,i,j);
 			part_of_matrix(blue,bs,rows,columns,size,i,j);
 			f(rs,gs,bs,params);
+			if (p->transpose)
+			{
+				int aux = rows;
+				rows = columns;
+				columns = aux;
+			}
 			restore_part_of_matrix(red,rs,rows,columns,size,i,j);
 			restore_part_of_matrix(green,gs,rows,columns,size,i,j);
 			restore_part_of_matrix(blue,bs,rows,columns,size,i,j);
 		}
+	}
 	free_matrix(rs);
 	free_matrix(gs);
 	free_matrix(bs);
