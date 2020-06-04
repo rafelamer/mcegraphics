@@ -142,10 +142,10 @@ void foreach_submatrices(double **red,double **green,double **blue,int rows,int 
 	make_matrix(gs,size,size);
 	make_matrix(bs,size,size);
 	r = rows/size;
-	if(size*r== rows)
+	if(size * r== rows)
 		r--;
 	c = columns/size;
-	if(size*c == columns)
+	if(size * c == columns)
 		c--;
 	for(int i=0;i<=r;i++)
 		for(int j=0;j<=c;j++)

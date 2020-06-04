@@ -45,7 +45,7 @@ void zlib_compress_data(short *in,unsigned char *out,int size,unsigned short *l)
 
 void zlib_uncompress_data(short *out,char *in,int size,FILE *stream)
 {
-  unsigned short l
+  unsigned short l;
   if (stream != NULL) 
   {
     file_read(&l,sizeof(unsigned short),1,stream);
@@ -142,14 +142,45 @@ void wsq_compress_data(short *in,unsigned char *out,int insize,int *outsize)
     *outsize = pos;
 }
 
+#define read_one_byte(x) do {	             \
+	if (stream == NULL)                      \
+  {    												  	         \
+		x = *aux;                              \
+		aux++;                                 \
+	}                                        \
+  else                                     \
+	  file_read(&x,sizeof(char),1,stream);   \
+} while (0)
 
-void wsq_uncompress_data(short *out,int size,FILE *stream)
+#define read_two_bytes(x,y) do {			     \
+	if (stream == NULL)                      \
+  {    												  	         \
+		x = *aux;                              \
+		aux++;                                 \
+		y = *aux;                              \
+		aux++;                                 \
+	}                                        \
+  else                                     \
+  {    												  	         \
+	  file_read(&x,sizeof(char),1,stream);   \
+	  file_read(&y,sizeof(char),1,stream);   \
+	}                                        \
+} while (0)
+
+
+
+
+
+void wsq_uncompress_data(short *out,unsigned char *in,int size,FILE *stream)
 {
   int count = 0;
+	unsigned char *aux;
+	aux = in;
+	
   while(count < size)
   {
     unsigned char p, q, r;
-    file_read(&p,sizeof(char),1,stream);
+	  read_one_byte(p);	  
     if((p > 0) && (p <= 100))
     {
       for(int i=0;i < p;i++)
@@ -158,15 +189,14 @@ void wsq_uncompress_data(short *out,int size,FILE *stream)
     }
     else if(p == 105)
     {
-      file_read(&q,sizeof(char),1,stream);
+			read_one_byte(q);
       for(int i=0;i < q;i++)
         out[count+i] = 0;
       count += q;
     }
     else if(p == 106)
     {
-      file_read(&q,sizeof(char),1,stream);
-      file_read(&r,sizeof(char),1,stream);
+			read_two_bytes(q,r);
       short val = 256*q+r;
       for(int i=0;i < val;i++)
         out[count+i] = 0;
@@ -174,29 +204,27 @@ void wsq_uncompress_data(short *out,int size,FILE *stream)
     }
     else if(p == 101)
     {
-      file_read(&q,sizeof(char),1,stream);
+			read_one_byte(q);
       out[count] = q;
       count++;
     }
     else if(p == 102)
     {
-      file_read(&q,sizeof(char),1,stream);
+			read_one_byte(q);
       out[count] = q;
       out[count] *= -1;
       count++;
     }
     else if(p == 103)
     {
-      file_read(&q,sizeof(char),1,stream);
-      file_read(&r,sizeof(char),1,stream);
+			read_two_bytes(q,r);
       short val = 256*q+r;
       out[count] = val;
       count++;
     }
     else if(p == 104)
     {
-      file_read(&q,sizeof(char),1,stream);
-      file_read(&r,sizeof(char),1,stream);
+      read_two_bytes(q,r);
       short val = 256*q+r;
       out[count] = val;
       out[count] *= -1;

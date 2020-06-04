@@ -16,7 +16,7 @@ int main(int argc,char *argv[])
   zigzag_matrix(z,size);
 
   /*
-    Generate a matrix if integers values and clone it
+    Generate a matrix of double values and clone it
    */
   for(i = 0;i < size;i++)
     for(j = 0; j < size;j++)
@@ -30,7 +30,7 @@ int main(int argc,char *argv[])
   dct_matrix(r,size,size,DCT_FWD,DCT_SCALED);
 
   /*
-    Truncate each number to the rearest integer and
+    Truncate each number to the nearest integer and
     store the values in a vector
    */
   for(i = 0;i < size;i++)

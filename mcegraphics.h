@@ -106,7 +106,7 @@ void zigzag_matrix(unsigned short **m,int size);
 void zlib_compress_data(short *in,unsigned char *out,int insize,unsigned short *l);
 void zlib_uncompress_data(short *out,char *in,int size,FILE *stream);
 void wsq_compress_data(short *in,unsigned char *out,int insize,int *outsize);
-void wsq_uncompress_data(short *out,int size,FILE *stream);
+void wsq_uncompress_data(short *out,unsigned char *in,int size,FILE *stream);
 
 /*
   File read and write

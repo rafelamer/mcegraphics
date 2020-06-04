@@ -20,7 +20,7 @@ int main(int argc,char *argv[])
   make_vector(out,sizeof(short) * size * size + 1);
 
   /*
-    Generate a matrix if integers values and clone it
+    Generate a matrix of double values and clone it
    */
   for(i = 0;i < size;i++)
     for(j = 0; j < size;j++)

@@ -50,7 +50,7 @@ void *realloc_or_exit(void *v,size_t nbytes, const char *file, int line);
       memcpy(v,(u),(n)*sizeof(*(u)));                         \
 } while (0)
 
-#define append_to_vector(u,v,m,n,f) do {                      \
+#define append_to_vector(u,v,m,n,f)  do {                     \
     if ((u) == NULL)                                          \
       (u) = xmalloc((n) * sizeof(*(u)));                      \
     else						      \

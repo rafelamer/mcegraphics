@@ -55,7 +55,7 @@ int main(int argc,char *argv[])
   /*
     Uncompress the data
    */
-  wsq_uncompress_data(vec,out,size * size);
+  wsq_uncompress_data(vec,out,size * size,NULL);
   
   /*
     Restore the values to the matrix
