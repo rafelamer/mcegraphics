@@ -83,6 +83,7 @@ int main(int argc,char *argv[])
 	*/
  	p = (Params)malloc(sizeof(function_params));
  	p->size = (unsigned short)args_info.blocksize_arg;
+	p->action = SAVEMATRIX;
  	unsigned short pw = 1;
  	while(pw < p->size)
  		pw *= 2;
@@ -91,9 +92,9 @@ int main(int argc,char *argv[])
  		p->size = 256;
 
  	p->T = NULL;
- 	make_vector(p->data,p->size*p->size);
- 	make_vector(p->vector,p->size*p->size);
- 	make_vector(p->cdata,sizeof(short)*p->size*p->size+1);
+ 	make_vector(p->data,p->size * p->size);
+ 	make_vector(p->vector,p->size * p->size);
+ 	make_vector(p->cdata,sizeof(short) * p->size * p->size+1);
  	p->quality = args_info.quality_arg;
  	p->inout = fopen(args_info.outfile_arg,"w");
  	make_matrix(p->zigzag,p->size,p->size);
@@ -114,12 +115,12 @@ int main(int argc,char *argv[])
 
 	if(img->pam.depth == 1)
 	{
-		foreach_submatrix(img->g,img->pam.height,img->pam.width,p->size,COPYMATRIX,process_submatrix,(void *)p);
+		foreach_submatrix(img->g,img->pam.height,img->pam.width,process_submatrix,(void *)p);
 	}
 	else
 	{
 		make_matrix(p->T,p->size,p->size);
-		foreach_submatrices(img->r,img->g,img->b,img->pam.height,img->pam.width,p->size,COPYMATRIX,process_submatrices,(void *)p);
+		foreach_submatrices(img->r,img->g,img->b,img->pam.height,img->pam.width,process_submatrices,(void *)p);
 		free_matrix(p->T);
 	}
 	free_vector(p->data);

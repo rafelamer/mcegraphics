@@ -47,7 +47,7 @@ int main(int argc,char *argv[])
   /*
     Uncompress the data
    */
-  zlib_uncompress_data(vec,out,size * size,NULL);
+  zlib_uncompress_data(vec,out,size * size);
   
   /*
     Restore the values to the matrix

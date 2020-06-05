@@ -114,7 +114,7 @@ void write_image(char *filename, Image img)
   pnm_writepaminit(pam);
   if (pam->format == PGM_FORMAT || pam->format == RPGM_FORMAT)
     write_pgm_pixel_data(img);
-  else if (pam->format == PPM_FORMAT || pam->format == RPPM_FORMAT)
+  else if ((pam->format == PPM_FORMAT) || (pam->format == RPPM_FORMAT))
     write_ppm_pixel_data(img);
   else {
     fprintf(stderr, "error: file %s, line %d: shouldn’t be here!\n",__FILE__, __LINE__);

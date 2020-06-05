@@ -66,6 +66,7 @@ int main(int argc,char *argv[])
  	make_vector(p->cdata,sizeof(short)*p->size*p->size+1);
  	make_matrix(p->zigzag,p->size,p->size);
  	zigzag_matrix(p->zigzag,p->size);
+	p->action = RESTOREMATRIX;
  	/*
 		Setting the image basic data
  	*/
@@ -95,11 +96,11 @@ int main(int argc,char *argv[])
 
 	if(img->pam.depth == 1)
 	{
-		foreach_submatrix(img->g,img->pam.height,img->pam.width,p->size,RESTOREMATRIX,process_submatrix,(void *)p);
+		foreach_submatrix(img->g,img->pam.height,img->pam.width,process_submatrix,(void *)p);
 	}
 	else
 	{
-		foreach_submatrices(img->r,img->g,img->b,img->pam.height,img->pam.width,p->size,RESTOREMATRIX,process_submatrices,(void *)p);
+		foreach_submatrices(img->r,img->g,img->b,img->pam.height,img->pam.width,process_submatrices,(void *)p);
 	}
 	write_image(args_info.outfile_arg,img);	
 	uncmdline_parser_free(&args_info);

@@ -2,6 +2,80 @@
 #include <string.h>
 #include <array.h>
 
+/****************************************************************************************
+* The functions aux_zlib_compress_data and aux_zlib_uncompress_data are based on the file
+* zpipe.c example of proper use of zlib's inflate() and deflate()
+*
+* zpipe.c:    Not copyrighted -- provided to the public domain
+*             Version 1.4  11 December 2005  Mark Adler
+*
+*             See https://www.zlib.net/zlib_how.html
+*****************************************************************************************/
+
+#define ZLIBCHUNK 16384
+
+#define CALL_ZLIB_DEFLATE(x)  unsigned char out[ZLIBCHUNK];							                \
+	st.avail_in = (x) * sizeof(unsigned char);														                \
+	st.next_in = (Bytef *)p;																							                \
+	insize -= (x);																												                \
+	flush = (insize == 0) ? Z_FINISH : Z_NO_FLUSH;												                \
+	do																																		                \
+	{																																			                \
+		size_t have;																												                \
+		st.avail_out = ZLIBCHUNK;																						                \
+		st.next_out = (Bytef *)out;																					                \
+		ret = deflate(&st,flush);																						                \
+		if ((ret != Z_OK) && (ret != Z_STREAM_END))													                \
+		{																																		                \
+			deflateEnd(&st);																									                \
+			free(str);																												                \
+			*alloc = 0;																												                \
+			*outsize = 0;																											                \
+			return NULL;																											                \
+		}																																		                \
+		have = ZLIBCHUNK - st.avail_out;																		                \
+		if ((*alloc - *outsize) < have)																			                \
+		{																																		                \
+			*alloc += ZLIBCHUNK;																							                \
+			if ((str = (unsigned char *)realloc(str,*alloc * sizeof(unsigned char))) == NULL) \
+				return NULL;																										                \
+		}																																		                \
+		memcpy(str + *outsize,out,have);																		                \
+		*outsize += have;																										                \
+	} while (st.avail_out == 0);																					                \
+	p += (x);
+
+#define CALL_ZLIB_INFLATE(x)  unsigned char out[ZLIBCHUNK];							                \
+	st.avail_in = (x) * sizeof(unsigned char);														                \
+	st.next_in = (Bytef *)p;																							                \
+	insize -= (x);																												                \
+	do																																		                \
+	{																																			                \
+		size_t have;																												                \
+		st.avail_out = ZLIBCHUNK;																						                \
+		st.next_out = (Bytef *)out;																					                \
+		ret = inflate(&st,Z_NO_FLUSH);																			                \
+		if ((ret != Z_OK)  && (ret != Z_STREAM_END))												                \
+		{																																		                \
+			inflateEnd(&st);																									                \
+			free(str);																												                \
+			*alloc = 0;																												                \
+			*outsize = 0;																											                \
+			return NULL;																											                \
+		}																																		                \
+		have = ZLIBCHUNK - st.avail_out;																		                \
+		if ((*alloc - *outsize) < have)																			                \
+		{																																		                \
+			*alloc += ZLIBCHUNK;																							                \
+			if ((str = (unsigned char *)realloc(str,*alloc * sizeof(unsigned char))) == NULL) \
+				return NULL;																										                \
+		}																																		                \
+		memcpy(str + *outsize,out,have);																		                \
+		*outsize += have;																										                \
+	} while (st.avail_out == 0);																					                \
+	p += (x);
+
+
 void zigzag_matrix(unsigned short **m,int size)
 {
   int r = 1;
@@ -26,44 +100,92 @@ void zigzag_matrix(unsigned short **m,int size)
   }
 }
 
-void zlib_compress_data(short *in,unsigned char *out,int size,unsigned short *l)
+unsigned char *aux_zlib_compress_data(unsigned char *data, size_t insize,size_t * outsize, size_t * alloc)
 {
-  z_stream defstream;
-  defstream.zalloc = Z_NULL;
-  defstream.zfree = Z_NULL;
-  defstream.opaque = Z_NULL;
-  defstream.avail_in = size*sizeof(short);
-  defstream.next_in = (Bytef *)in;
-  defstream.avail_out = (uInt)(size*sizeof(short)+1);
-  defstream.next_out = (Bytef *)out;
+	z_stream st;
+	unsigned char *str, *p;
+	int flush, ret;
 
-  deflateInit(&defstream, Z_BEST_COMPRESSION);
-  deflate(&defstream, Z_FINISH);
-  deflateEnd(&defstream);
-  *l = strlen((const char *)out);
+	*outsize = 0;
+	*alloc = 0;
+	if (insize == 0)
+		return NULL;
+
+	st.zalloc = Z_NULL;
+	st.zfree = Z_NULL;
+	st.opaque = Z_NULL;
+	if (deflateInit(&st, Z_BEST_COMPRESSION) != Z_OK)
+		return NULL;
+
+	*alloc = 2 * ZLIBCHUNK;
+	if ((str = (unsigned char *)calloc(*alloc, sizeof(unsigned char))) == NULL)
+		return NULL;
+
+	p = data;
+	while (insize > ZLIBCHUNK)
+	{
+		CALL_ZLIB_DEFLATE(ZLIBCHUNK);
+	}
+	if (insize > 0)
+	{
+		CALL_ZLIB_DEFLATE(insize);
+	}
+	deflateEnd(&st);
+	return str;
 }
 
-void zlib_uncompress_data(short *out,char *in,int size,FILE *stream)
+unsigned char *aux_zlib_uncompress_data(unsigned char *data, size_t insize,size_t * outsize, size_t * alloc)
 {
-  unsigned short l;
-  if (stream != NULL) 
-  {
-    file_read(&l,sizeof(unsigned short),1,stream);
-    file_read(&in,sizeof(char),l,stream);
-  }
+	z_stream st;
+	unsigned char *str, *p;
+	int ret;
 
-  z_stream infstream; 
-  infstream.zalloc = Z_NULL;
-  infstream.zfree = Z_NULL;
-  infstream.opaque = Z_NULL;
-  infstream.avail_in = (uInt)(strlen(in));
-  infstream.next_in = (Bytef *)in;
-  infstream.avail_out = (uInt)(size*size);
-  infstream.next_out = (Bytef *)out;
+	*outsize = 0;
+	*alloc = 0;
+	if (insize == 0)
+		return NULL;
 
-  inflateInit(&infstream);
-  inflate(&infstream, Z_NO_FLUSH);
-  inflateEnd(&infstream);
+	st.zalloc = Z_NULL;
+	st.zfree = Z_NULL;
+	st.opaque = Z_NULL;
+	if (inflateInit(&st) != Z_OK)
+		return NULL;
+
+	*alloc = ZLIBCHUNK;
+	if ((str = (unsigned char *)calloc(*alloc, sizeof(unsigned char))) == NULL)
+		return NULL;
+
+	p = data;
+	while (insize > ZLIBCHUNK)
+	{
+		CALL_ZLIB_INFLATE(ZLIBCHUNK);
+	}
+	if (insize > 0)
+	{
+		CALL_ZLIB_INFLATE(insize);
+	}
+	inflateEnd(&st);
+	return str;
+}
+
+
+void zlib_compress_data(short *in,unsigned char *out,int size,unsigned short *l)
+{
+  unsigned char *aux;
+  size_t outsize, alloc;
+  aux = aux_zlib_compress_data((unsigned char *)in,size,&outsize,&alloc);
+  memcpy(out,aux,outsize);
+  free(aux);
+  *l = outsize;
+}
+
+void zlib_uncompress_data(short *out,char *in,int size)
+{ 
+  unsigned char *aux;
+  size_t outsize, alloc;
+  aux = aux_zlib_uncompress_data(in,size,&outsize,&alloc);
+  memcpy(out,aux,outsize);
+  free(aux);
 }
 
 void wsq_compress_data(short *in,unsigned char *out,int insize,int *outsize)
@@ -166,10 +288,6 @@ void wsq_compress_data(short *in,unsigned char *out,int insize,int *outsize)
 	  file_read(&y,sizeof(char),1,stream);   \
 	}                                        \
 } while (0)
-
-
-
-
 
 void wsq_uncompress_data(short *out,unsigned char *in,int size,FILE *stream)
 {

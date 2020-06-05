@@ -27,9 +27,10 @@ int main(int argc,char *argv[])
 	Params p;
  	p = (Params)malloc(sizeof(function_params));
 	p->size = 256;
+	p->action = OVERWRITEMATRIX;
  	pm_init(argv[0],0);
 	img = read_image("tiger.ppm");
-	foreach_submatrices(img->r,img->g,img->b,img->pam.height,img->pam.width,p->size,transform,(void *)p);
+	foreach_submatrices(img->r,img->g,img->b,img->pam.height,img->pam.width,transform,(void *)p);
 	write_image("tiger2.ppm",img);
   
 	freeImage(img);

@@ -1,5 +1,5 @@
 /**************************************************************************************
-* Filename:   submatrix-compress.c
+* Filename:   prune-matrix.c
 * Author:     Rafel Amer (rafel.amer AT upc.edu)
 * Copyright:  Rafel Amer 2018
 * Disclaimer: This code is presented "as is" and it has been written to 
@@ -39,7 +39,7 @@ void prune_matrix_by_percentage(double **g,double *vec,int m,int n,int quality)
 {
 	int zeros = 0;
 	matrix_to_vector(g,vec,m,n,double);
-	for(int i=0;i<m*n;i++)
+	for(int i = 0;i < m * n;i++)
 		if(vec[i] < 0)
 			vec[i] *= -1;
 	qsort(vec,m*n,sizeof(double),cmpfunc);
@@ -70,13 +70,14 @@ void prune_matrices_by_percentage(double **r,double **g,double **b,double **T,do
 			T[i][j] = sqrt(rv*rv+gv*gv+bv*bv);
 		}
 	matrix_to_vector(T,vec,m,n,double);
-	qsort(vec,m*n,sizeof(double),cmpfunc);
-	while((vec[zeros] == 0) && (zeros < m*n))
+	qsort(vec,m * n,sizeof(double),cmpfunc);
+	while((vec[zeros] == 0) && (zeros < m * n))
 		zeros++;
 	int k;
 	double t;
-	k = zeros+(100.0-quality)/100.0*(m*n - zeros);
+	k = zeros+(100.0-quality)/100.0*(m * n - zeros);
 	t = vec[k];
+	k = 0;
 	for(int i=0;i < m;i++)
 		for(int j=0;j < n;j++)
 		{
@@ -85,6 +86,7 @@ void prune_matrices_by_percentage(double **r,double **g,double **b,double **T,do
 				r[i][j] = 0.0;
 				g[i][j] = 0.0;
 				b[i][j] = 0.0;
+				k++;
 			}
 			else
 			{
