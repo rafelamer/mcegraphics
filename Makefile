@@ -1,4 +1,4 @@
-CFLAGS = -fPIC -O3 -I.
+CFLAGS = -fPIC -O3 -I. -I/usr/include/netpbm
 CC = gcc
 TARGET = libmcegraphics.so.1.0.0
 OBJECTS = xmalloc.o image-io.o haar-wavelet.o dct.o data-compress.o file-rw.o \

@@ -1,4 +1,4 @@
-CFLAGS = -O3 -I.
+CFLAGS = -O3 -I. -I/usr/include/netpbm
 LIBS = -lmcegraphics -lnetpbm -lfftw3 -lm -lz
 CC = gcc
 TARGET1 = mcecompress 
