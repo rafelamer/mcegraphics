@@ -1,4 +1,4 @@
-CFLAGS = -O3 -I.
+CFLAGS = -O3 -I. -I/usrinclude/netpbm/
 CC = gcc
 
 TARGETS = test01 test02 test03 test04 test05 test06 test07 test08 \
@@ -21,5 +21,3 @@ all:
 
 clean:
 	rm -f $(TARGETS) tiger2.ppm tiger3.ppm
-
-
