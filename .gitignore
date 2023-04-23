@@ -1,4 +1,4 @@
-__pycache__/*
+*/__pycache__/*
 *.o
 libmcegraphics.so.1.0.0
 cmdline.c
